@@ -36,10 +36,11 @@ public class Main {
         return (end_time-start_time)/1000000;
     }
     public static boolean is_in_flower_range(Color pixel, Color bottom_range, Color upper_range){
-        return pixel.getBlue() >= bottom_range.getBlue() && pixel.getBlue() <= upper_range.getBlue()
+        boolean flag =  pixel.getBlue() >= bottom_range.getBlue() && pixel.getBlue() <= upper_range.getBlue()
                 && pixel.getRed() >= bottom_range.getRed() && pixel.getRed() <= upper_range.getRed()
                 && pixel.getGreen() >= bottom_range.getGreen() && pixel.getGreen() <= upper_range.getGreen();
 
+        return flag;
     }
 
     public static long threaded(BufferedImage img) throws InterruptedException {
@@ -53,8 +54,10 @@ public class Main {
             threads[i].start();
         }
 
-        threads[threads.length-1].join();
-        long end_time = System.nanoTime();
+        for (int i = 0; i<threads.length; i++) {
+            threads[i].join();
+        }
+            long end_time = System.nanoTime();
         return (end_time-start_time)/1000000;
     }
 
@@ -62,7 +65,7 @@ public class Main {
         for (int x = startx; x<endx; x++){
             for (int y = 0; y < img.getHeight(); y++){
                 Color c = new Color(img.getRGB(x,y));
-                if (is_in_flower_range(c, new Color(88, 88,76), new Color(255,255,255)))
+                if (is_in_flower_range(c, new Color(80,80,110), new Color(255,255,255)))
                     img.setRGB(x,y,blend(c, purple));
             }
         }
@@ -70,8 +73,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         BufferedImage img = ImageIO.read(new File("many-flowers.jpg"));
-        System.out.println(regular(img));
-        //System.out.println(threaded(img));
+        //System.out.println(regular(img));
+        System.out.println(threaded(img));
         File output = new File("output.jpg");
         try {
             ImageIO.write(img, "jpg", output);
