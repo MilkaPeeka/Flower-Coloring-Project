@@ -29,23 +29,18 @@ public class Main {
     }
 
     public static long regular(BufferedImage img){
-        long start_time = System.nanoTime();
-
         Color purple = new Color(190, 10, 160);
-        int width = img.getWidth();
-        int height = img.getHeight();
-
-        for (int x = 0; x < width; x++){
-            for (int y = 0; y < height; y++){
-                Color c = new Color(img.getRGB(x,y));
-                if (c.getRed() >= 150 && c.getGreen() >= 150 && c.getBlue() >= 140)
-                    img.setRGB(x,y,blend(c, purple));
-            }
-        }
+        long start_time = System.nanoTime();
+        change_part(img, 0, img.getWidth(), purple);
         long end_time = System.nanoTime();
         return (end_time-start_time)/1000000;
     }
+    public static boolean is_in_flower_range(Color pixel, Color bottom_range, Color upper_range){
+        return pixel.getBlue() >= bottom_range.getBlue() && pixel.getBlue() <= upper_range.getBlue()
+                && pixel.getRed() >= bottom_range.getRed() && pixel.getRed() <= upper_range.getRed()
+                && pixel.getGreen() >= bottom_range.getGreen() && pixel.getGreen() <= upper_range.getGreen();
 
+    }
 
     public static long threaded(BufferedImage img) throws InterruptedException {
         long start_time = System.nanoTime();
@@ -67,7 +62,7 @@ public class Main {
         for (int x = startx; x<endx; x++){
             for (int y = 0; y < img.getHeight(); y++){
                 Color c = new Color(img.getRGB(x,y));
-                if (c.getRed() >= 150 && c.getGreen() >= 150 && c.getBlue() >= 140)
+                if (is_in_flower_range(c, new Color(88, 88,76), new Color(255,255,255)))
                     img.setRGB(x,y,blend(c, purple));
             }
         }
@@ -76,7 +71,7 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         BufferedImage img = ImageIO.read(new File("many-flowers.jpg"));
         System.out.println(regular(img));
-        System.out.println(threaded(img));
+        //System.out.println(threaded(img));
         File output = new File("output.jpg");
         try {
             ImageIO.write(img, "jpg", output);
